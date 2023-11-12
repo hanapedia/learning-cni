@@ -1,0 +1,20 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: kind-with-sample-cni
+networking:
+  # the default CNI will not be installed
+  disableDefaultCNI: true
+  podSubnet: "10.244.0.0/16"
+nodes:
+- role: control-plane
+  extraMounts:
+    - hostPath: example/cni-from-scratch-master/bin/my-cni-demo
+      containerPath: /opt/cni/bin/my-cni-demo
+    # - hostPath: example/cni-from-scratch-master/net.d/10-my-cni-demo.conf
+    #   containerPath: /etc/cni/net.d/10-my-cni-demo.conf
+- role: worker
+  extraMounts:
+    - hostPath: example/cni-from-scratch-master/bin/my-cni-demo
+      containerPath: /opt/cni/bin/my-cni-demo
+    # - hostPath: example/cni-from-scratch-master/net.d/10-my-cni-demo.conf
+    #   containerPath: /etc/cni/net.d/10-my-cni-demo.conf

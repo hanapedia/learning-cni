@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cni-config-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: cni-config
+  template:
+    metadata:
+      labels:
+        app: cni-config
+    spec:
+      # Running on the host's network namespace
+      hostNetwork: true
+      # Automatically mount the service account token
+      automountServiceAccountToken: false
+      containers:
+      - name: cni-config
+        image: hiroki11hanada/cni-install:v0.0.1
+        securityContext:
+          # Granting privileged mode to access host resources
+          privileged: true
+        volumeMounts:
+          # Mounting the host's CNI binary directory
+        - name: cni-bin-dir
+          mountPath: /host/opt/cni/bin
+          # Mounting the host's CNI configuration directory
+        - name: cni-net-dir
+          mountPath: /host/etc/cni/net.d
+        command: ["/bin/sh"]
+        args:
+          - "-c"
+          - >
+            cp /usr/local/bin/bash /host/opt/cni/bin/ &&
+            cp /etc/cni/net.d/* /host/etc/cni/net.d/;
+            # Keep the container running
+            tail -f /dev/null
+      volumes:
+      - name: cni-bin-dir
+        hostPath:
+          path: /opt/cni/bin
+      - name: cni-net-dir
+        hostPath:
+          path: /etc/cni/net.d

@@ -1,0 +1,10 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: kind-without-cni
+networking:
+  # the default CNI will not be installed
+  disableDefaultCNI: true
+  podSubnet: "10.244.0.0/16"
+nodes:
+- role: control-plane
+- role: worker
